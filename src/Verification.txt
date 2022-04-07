@@ -1,0 +1,64 @@
+exec (acomp a) (0,s,[]) == (length (acomp a), s, [aval a s])
+
+Proof:
+To verify the correctness of compilation for arithmetic expressions
+we need to consider all 3 cases/types of arithmetic expressions:
+	N Val, V Vname and Plus AExp AExp
+
+For the proof induction will be employed, as the program has/can have a recursive behaviour
+	Plus a1 a2 = Plus (Plus a1 a2) N x = ...
+
+
+Base Case: p(N x) where x is an integer
+	exec (acomp (N x)) (0,s,[]) == (length (acomp (N x)),s,[aval (N x) s])
+
+	[applying acomp] exec ([LOADI x]) (0,s,[]) == (length ([LOADI x]),s,[aval (N x) s])
+	[applying aval] exec ([LOADI x]) (0,s,[]) == (length ([LOADI x]),s,[x])
+	[applying exec] (1,s,[x]) == (length ([LOADI x]),s,[x])
+	[applying length] (1,s,[x]) == (1,s,[x])
+	Hence proving the equality for all integers values x, p(x)
+
+Base Case: p(V v) where v is a string
+	exec (acomp (V v)) (0,s,[]) == (length (acomp (V v)),s,[aval (V v) s])
+
+	[applying acomp] exec ([LOAD v]) (0,s,[]) == (length ([LOAD v]),s,[aval (V v) s])
+	[applying aval] exec ([LOAD v]) (0,s,[]) == (length ([LOAD v]),s,[v])
+	[applying exec] (1,s,[v]) == (length ([LOAD v]),s,[v])
+	[applying length] (1,s,[v]) == (1,s,[v])
+	Hence proving the equality for all string values v, p(v)
+
+
+Inductive Case: Assuming p(N x) or p(V v) and showing p(Plus a1 a2)
+	exec (acomp (Plus a1 a2)) (0,s,[]) == (length (Plus a1 a2),s,[aval (Plus a1 a2) s])
+
+	[applying acomp] exec (acomp a1 ++ acomp a2 ++ [ADD]) (0,s,[]) == 
+		(length (acomp a1 ++ acomp a2 ++ [ADD]),s,[aval (Plus a1 a2) s])
+	[applying aval] exec (acomp a1 ++ acomp a2 ++ [ADD]) (0,s,[]) == 
+		(length (acomp a1 ++ acomp a2 ++ [ADD]),s,[aval a1 s + aval a2 s])
+	If continued (similar to base cases), progress can't be made due to recursion
+
+	assume nP = number of used "Plus" expressions in a particular arithmetic expression
+		if Plus a1 a2 then nP = 1
+		if Plus (Plus a1 a2) (Plus a3 a4) then nP = 3
+	then for any recursive arithmetic expression, we obtain;
+
+	[applying induction hypothesis; p(N x)]
+	exec ([LOADI x1, LOADI x2, ADD1, LOADI x3, LOADI x4, ADD2] ++ ...
+		... ++ [LOADI x{nP}, LOADI x{nP + 1}] ++ ... ++ [ADD{nP})]) (0,s,[])
+		==
+	(length ([LOADI x1, LOADI x2, ADD1, LOADI x3, LOADI x4, ADD2] ++ ...
+		... ++ [LOADI x{nP}, LOADI x{nP + 1}] ++ ... ++ [ADD{nP})]),s,
+		[x1 + x2 + ... + x{nP + 1}])
+	hence;
+	(2nP + 1,s,[x1 + x2 + ... + x{nP + 1}]) == (2nP + 1,s,[x1 + x2 + ... + x{nP + 1}])
+		where 2nP + 1 = nP + 1 (number of LOADI instructions) + nP (number of ADD instructions)
+
+	Thus any used arithmetic expression (either base cases (N x)/(V v) or the inductive case (Plus a1 a2)
+	with any number of recursions (nPs)) the equality will hold.
+
+	As p(N x) and (V v) are practically the same, the inductive case can be shown assuming p(V v) in a similar manner
+
+
+	NOTE: 
+	numbers beside ADD (e.g., ADD1, ADD{nP}) is for demonstration purposes:
+	number of "Plus" in an arithmetic expression == number of ADD instructions that arithmetic will compile to

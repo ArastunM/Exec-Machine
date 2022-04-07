@@ -9,7 +9,7 @@ main = defaultMain tests
 tests :: TestTree
 tests = testGroup "Tests" [machine,machineAdvanced,
                            interpreter,interpreterAdvanced,
-                           compiler, compilerAdvanced]
+                           compiler,compilerAdvanced]
 
 machine = testGroup "Machine Tests"
   [ testCase "Single Instruction" $

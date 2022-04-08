@@ -47,5 +47,5 @@ To run the testcases (executing all tests from [test](https://github.com/Arastun
 
 ## Details
 - Author - Arastun Mammadli
-- Completed as part of [ECM2418](http://emps.exeter.ac.uk/modules/ECM2418) coursework.
+- Completed as part of [ECM2418](http://emps.exeter.ac.uk/modules/ECM2418) coursework
 - License - [MIT](LICENSE)
